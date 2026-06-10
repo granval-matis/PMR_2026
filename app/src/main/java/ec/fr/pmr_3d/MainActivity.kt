@@ -1,7 +1,6 @@
 package ec.fr.pmr_3d
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,9 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import dev.romainguy.kotlin.math.Float3
 import ec.fr.pmr_3d.ui.theme.Pmr_3dTheme
 import io.github.sceneview.Scene
@@ -62,7 +61,9 @@ fun FilamentScreen() {
 
 @Composable
 fun Viewer3D() {
-    val currentAnimation = remember { mutableStateOf("animation1") } // "animation1" ou "animation2"
+    val currentAnimation = remember { mutableStateOf("animation1") }
+    val pendingAnimation = remember { mutableStateOf<String?>(null) }
+
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
     val debugLines = remember { mutableStateListOf<String>() }
@@ -70,7 +71,6 @@ fun Viewer3D() {
     val cameraNode = rememberCameraNode(engine).apply {
         position = Float3(0f, 1f, 4f)
     }
-
     val mainLightNode = rememberMainLightNode(engine).apply {
         intensity = 100_000f
     }
@@ -78,9 +78,32 @@ fun Viewer3D() {
     val fondEntity = remember { mutableStateOf<Int?>(null) }
     val gaucheEntity = remember { mutableStateOf<Int?>(null) }
     val droiteEntity = remember { mutableStateOf<Int?>(null) }
+    val hautEntity = remember { mutableStateOf<Int?>(null) }
+    val basEntity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau5Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau6Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau7Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau8Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau9Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau10Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau11Entity = remember { mutableStateOf<Int?>(null) }
+    val bitoniau12Entity = remember { mutableStateOf<Int?>(null) }
+
     val fondOriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
     val gaucheOriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
     val droiteOriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+
+    val hautOriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val basOriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+
+    val bitoniau5OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau6OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau7OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau8OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau9OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau10OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau11OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
+    val bitoniau12OriginalTransform = remember { mutableStateOf<FloatArray?>(null) }
 
     val startTimeNanos = remember { mutableStateOf(0L) }
 
@@ -96,84 +119,85 @@ fun Viewer3D() {
         }
     }
 
+    fun extractTransform(tm: com.google.android.filament.TransformManager, entity: Int): FloatArray {
+        val tmInstance = tm.getInstance(entity)
+        val mat = tm.getTransform(tmInstance)
+        return floatArrayOf(
+            mat.x.x, mat.x.y, mat.x.z, mat.x.w,
+            mat.y.x, mat.y.y, mat.y.z, mat.y.w,
+            mat.z.x, mat.z.y, mat.z.z, mat.z.w,
+            mat.w.x, mat.w.y, mat.w.z, mat.w.w
+        )
+    }
+
+    fun setEntityVisible(entity: Int, visible: Boolean) {
+        val rm = engine.renderableManager
+        if (rm.hasComponent(entity)) {
+            val ri = rm.getInstance(entity)
+            rm.setLayerMask(ri, 0xFF, if (visible) 0xFF else 0x00)
+        }
+    }
+
     LaunchedEffect(modelNode) {
         modelNode?.let { node ->
             val asset = node.modelInstance.asset
-
-            val entity_fond = asset.getFirstEntityByName("fond")
-            val entity_gauche = asset.getFirstEntityByName("gauche")
-            val entity_droite = asset.getFirstEntityByName("droite")
-
             val tm = engine.transformManager
 
-            // Initialise les entités
-            if (entity_fond != 0) {
-                fondEntity.value = entity_fond
-                debugLines.add("🎯 Entité 'fond' trouvée (id=$entity_fond)")
-            } else {
-                debugLines.add("⚠️ Entité 'fond' introuvable")
+            listOf(
+                "fond", "gauche", "droite", "haut", "bas",
+                "bitoniau_5", "bitoniau_6", "bitoniau_7", "bitoniau_8",
+                "bitoniau_9", "bitoniau_10", "bitoniau_11", "bitoniau_12"
+            ).forEach { name ->
+                val entity = asset.getFirstEntityByName(name)
+                if (entity != 0) {
+                    debugLines.add("🎯 '$name' trouvé (id=$entity)")
+                    val transform = extractTransform(tm, entity)
+                    when (name) {
+                        "fond"       -> { fondEntity.value = entity; fondOriginalTransform.value = transform }
+                        "gauche"     -> { gaucheEntity.value = entity; gaucheOriginalTransform.value = transform }
+                        "droite"     -> { droiteEntity.value = entity; droiteOriginalTransform.value = transform }
+                        "haut"       -> { hautEntity.value = entity; hautOriginalTransform.value = transform }
+                        "bas"        -> { basEntity.value = entity; basOriginalTransform.value = transform }
+                        "bitoniau_5" -> { bitoniau5Entity.value = entity; bitoniau5OriginalTransform.value = transform }
+                        "bitoniau_6" -> { bitoniau6Entity.value = entity; bitoniau6OriginalTransform.value = transform }
+                        "bitoniau_7" -> { bitoniau7Entity.value = entity; bitoniau7OriginalTransform.value = transform }
+                        "bitoniau_8" -> { bitoniau8Entity.value = entity; bitoniau8OriginalTransform.value = transform }
+                        "bitoniau_9" -> { bitoniau9Entity.value = entity; bitoniau9OriginalTransform.value = transform }
+                        "bitoniau_10"-> { bitoniau10Entity.value = entity; bitoniau10OriginalTransform.value = transform }
+                        "bitoniau_11"-> { bitoniau11Entity.value = entity; bitoniau11OriginalTransform.value = transform }
+                        "bitoniau_12"-> { bitoniau12Entity.value = entity; bitoniau12OriginalTransform.value = transform }
+                    }
+                } else {
+                    debugLines.add("⚠️ '$name' introuvable")
+                }
             }
 
-            if (entity_gauche != 0) {
-                gaucheEntity.value = entity_gauche
-                debugLines.add("🎯 Entité 'gauche' trouvée (id=$entity_gauche)")
-            } else {
-                debugLines.add("⚠️ Entité 'gauche' introuvable")
+            hautEntity.value?.let { setEntityVisible(it, false) }
+            basEntity.value?.let { setEntityVisible(it, false) }
+            (5..12).forEach { i ->
+                asset.getFirstEntityByName("bitoniau_$i").takeIf { it != 0 }?.let {
+                    setEntityVisible(it, false)
+                }
             }
 
-            if (entity_droite != 0) {
-                droiteEntity.value = entity_droite
-                debugLines.add("🎯 Entité 'droite' trouvée (id=$entity_droite)")
-            } else {
-                debugLines.add("⚠️ Entité 'droite' introuvable")
-            }
+            hautEntity.value?.let { setEntityVisible(it, false) }
+            basEntity.value?.let { setEntityVisible(it, false) }
+            bitoniau5Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau6Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau7Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau8Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau9Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau10Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau11Entity.value?.let { setEntityVisible(it, false) }
+            bitoniau12Entity.value?.let { setEntityVisible(it, false) }
 
-            // Récupère les matrices de transformation **pour chaque entité**
-            if (entity_fond != 0) {
-                val tmInstanceFond = tm.getInstance(entity_fond)
-                val matFond = tm.getTransform(tmInstanceFond)
-                fondOriginalTransform.value = floatArrayOf(
-                    matFond.x.x, matFond.x.y, matFond.x.z, matFond.x.w,
-                    matFond.y.x, matFond.y.y, matFond.y.z, matFond.y.w,
-                    matFond.z.x, matFond.z.y, matFond.z.z, matFond.z.w,
-                    matFond.w.x, matFond.w.y, matFond.w.z, matFond.w.w
-                )
-                debugLines.add("📐 Transform d'origine sauvegardée pour 'fond'")
-            }
-
-            if (entity_gauche != 0) {
-                val tmInstanceGauche = tm.getInstance(entity_gauche)
-                val matGauche = tm.getTransform(tmInstanceGauche)
-                gaucheOriginalTransform.value = floatArrayOf(
-                    matGauche.x.x, matGauche.x.y, matGauche.x.z, matGauche.x.w,
-                    matGauche.y.x, matGauche.y.y, matGauche.y.z, matGauche.y.w,
-                    matGauche.z.x, matGauche.z.y, matGauche.z.z, matGauche.z.w,
-                    matGauche.w.x, matGauche.w.y, matGauche.w.z, matGauche.w.w
-                )
-                debugLines.add("📐 Transform d'origine sauvegardée pour 'gauche'")
-            }
-
-            if (entity_droite != 0) {
-                val tmInstanceDroite = tm.getInstance(entity_droite)
-                val matDroite = tm.getTransform(tmInstanceDroite)
-                droiteOriginalTransform.value = floatArrayOf(
-                    matDroite.x.x, matDroite.x.y, matDroite.x.z, matDroite.x.w,
-                    matDroite.y.x, matDroite.y.y, matDroite.y.z, matDroite.y.w,
-                    matDroite.z.x, matDroite.z.y, matDroite.z.z, matDroite.z.w,
-                    matDroite.w.x, matDroite.w.y, matDroite.w.z, matDroite.w.w
-                )
-                debugLines.add("📐 Transform d'origine sauvegardée pour 'droite'")
-            }
-
-            // Affiche les noms des nœuds disponibles pour le debug
             debugLines.add("📋 Nœuds disponibles :")
-            asset.renderableNames.forEach { name ->
-                debugLines.add("  • '$name'")
-            }
+            asset.renderableNames.forEach { debugLines.add("  • '$it'") }
         }
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // --- Scene 3D ---
+
         Scene(
             modifier = Modifier.fillMaxSize(),
             engine = engine,
@@ -186,76 +210,141 @@ fun Viewer3D() {
                     startTimeNanos.value = frameTimeNanos
                 }
 
-                val entity_fond = fondEntity.value
-                val entity_gauche = gaucheEntity.value
-                val entity_droite = droiteEntity.value
-                val originalTransformFond = fondOriginalTransform.value
-                val originalTransformGauche = gaucheOriginalTransform.value
-                val originalTransformDroite = droiteOriginalTransform.value
+                val elapsed = (frameTimeNanos - startTimeNanos.value) / 1_000_000_000f
+                val t = elapsed * (Math.PI.toFloat())
+                val factor = (1f - kotlin.math.cos(t)) / 2f
 
-                if (entity_fond != null && entity_gauche != null && entity_droite != null &&
-                    originalTransformFond != null && originalTransformGauche != null && originalTransformDroite != null) {
 
-                    val elapsed = (frameTimeNanos - startTimeNanos.value) / 1_000_000_000f
+                val cycleProgress = elapsed % 2.0f
+                val isEndOfCycle = cycleProgress > 1.97f || cycleProgress < 0.03f
 
-                    when (currentAnimation.value) {
-                        "animation1" -> {
-                            // Logique actuelle (translation en Z)
-                            val t = elapsed * (2f * Math.PI.toFloat())
-                            val factor = (1f - kotlin.math.cos(t)) / 2f
-                            val offsetZ = factor * 0.08f
+                if (pendingAnimation.value != null && isEndOfCycle) {
+                    val next = pendingAnimation.value!!
 
-                            val tm = engine.transformManager
+                    hautEntity.value?.let { setEntityVisible(it, next != "animation1") }
+                    basEntity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau5Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau6Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau7Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau8Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau9Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau10Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau11Entity.value?.let { setEntityVisible(it, next != "animation1") }
+                    bitoniau12Entity.value?.let { setEntityVisible(it, next != "animation1") }
 
-                            val tmInstanceFond = tm.getInstance(entity_fond)
-                            val newTransformFond = originalTransformFond.copyOf()
-                            newTransformFond[14] += offsetZ
-                            tm.setTransform(tmInstanceFond, newTransformFond)
+                    currentAnimation.value = next
+                    pendingAnimation.value = null
+                    startTimeNanos.value = frameTimeNanos
+                    debugLines.add("✅ Switched to $next")
+                }
 
-                            val tmInstanceGauche = tm.getInstance(entity_gauche)
-                            val newTransformGauche = originalTransformGauche.copyOf()
-                            newTransformGauche[14] -= offsetZ
-                            tm.setTransform(tmInstanceGauche, newTransformGauche)
+                when (currentAnimation.value) {
+                    "animation1" -> {
+                        val entity_fond = fondEntity.value ?: return@Scene
+                        val entity_gauche = gaucheEntity.value ?: return@Scene
+                        val entity_droite = droiteEntity.value ?: return@Scene
+                        val origFond = fondOriginalTransform.value ?: return@Scene
+                        val origGauche = gaucheOriginalTransform.value ?: return@Scene
+                        val origDroite = droiteOriginalTransform.value ?: return@Scene
 
-                            val tmInstanceDroite = tm.getInstance(entity_droite)
-                            val newTransformDroite = originalTransformDroite.copyOf()
-                            newTransformDroite[14] -= offsetZ
-                            tm.setTransform(tmInstanceDroite, newTransformDroite)
+                        val offsetZ = factor * 0.08f
+                        val tm = engine.transformManager
+
+                        val newFond = origFond.copyOf()
+                        newFond[14] += offsetZ
+                        tm.setTransform(tm.getInstance(entity_fond), newFond)
+
+                        val newGauche = origGauche.copyOf()
+                        newGauche[14] -= offsetZ
+                        tm.setTransform(tm.getInstance(entity_gauche), newGauche)
+
+                        val newDroite = origDroite.copyOf()
+                        newDroite[14] -= offsetZ
+                        tm.setTransform(tm.getInstance(entity_droite), newDroite)
+                    }
+
+                    "animation2" -> {
+                        val tm = engine.transformManager
+                        val t = elapsed * (2f * Math.PI.toFloat())
+                        val factor = (1f - kotlin.math.cos(t)) / 2f  // 0 → 1 → 0 en 1s
+
+                        hautEntity.value?.let { entity ->
+                            hautOriginalTransform.value?.let { orig ->
+                                val newT = orig.copyOf()
+                                newT[13] -= factor * 0.08f
+                                tm.setTransform(tm.getInstance(entity), newT)
+                            }
                         }
 
-                        "animation2" -> {
-                            // TODO: Implémenter l'animation 2 ici
-                            // Exemple : rotation ou autre mouvement
-                            debugLines.add("⏳ Animation 2 non encore implémentée")
+                        listOf(
+                            bitoniau9Entity to bitoniau9OriginalTransform,
+                            bitoniau10Entity to bitoniau10OriginalTransform,
+                            bitoniau11Entity to bitoniau11OriginalTransform,
+                            bitoniau12Entity to bitoniau12OriginalTransform
+                        ).forEach { (entityState, transformState) ->
+                            entityState.value?.let { entity ->
+                                transformState.value?.let { orig ->
+                                    val newT = orig.copyOf()
+                                    newT[13] -= factor * 0.04f
+                                    tm.setTransform(tm.getInstance(entity), newT)
+                                }
+                            }
+                        }
+
+                        basEntity.value?.let { entity ->
+                            basOriginalTransform.value?.let { orig ->
+                                val newT = orig.copyOf()
+                                newT[13] += factor * 0.08f
+                                tm.setTransform(tm.getInstance(entity), newT)
+                            }
+                        }
+
+                        listOf(
+                            bitoniau5Entity to bitoniau5OriginalTransform,
+                            bitoniau6Entity to bitoniau6OriginalTransform,
+                            bitoniau7Entity to bitoniau7OriginalTransform,
+                            bitoniau8Entity to bitoniau8OriginalTransform
+                        ).forEach { (entityState, transformState) ->
+                            entityState.value?.let { entity ->
+                                transformState.value?.let { orig ->
+                                    val newT = orig.copyOf()
+                                    newT[13] += factor * 0.04f
+                                    tm.setTransform(tm.getInstance(entity), newT)
+                                }
+                            }
                         }
                     }
                 }
             }
         )
 
-        // --- Bouton pour basculer ---
         Button(
             onClick = {
-                currentAnimation.value =
-                    if (currentAnimation.value == "animation1") "animation2"
-                    else "animation1"
-                debugLines.add("🔄 Animation changée : ${currentAnimation.value}")
+                val target = if (currentAnimation.value == "animation1") "animation2" else "animation1"
+                pendingAnimation.value = target
+                debugLines.add("🕐 En attente de fin de cycle pour passer à $target")
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
         ) {
-            Text("Basculer Animation (${currentAnimation.value})")
+            Text(
+                if (pendingAnimation.value != null)
+                    "⏳ En attente... (${currentAnimation.value})"
+                else
+                    "Basculer Animation (${currentAnimation.value})"
+            )
         }
 
-        // --- Overlay debug ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Black.copy(alpha = 0.7f))
                 .padding(12.dp)
         ) {
-            // ... (ton code existant pour les logs)
+            Text("=== DEBUG ===", color = Color.Yellow, fontWeight = FontWeight.Bold)
+            if (debugLines.isEmpty()) Text("(aucun log)", color = Color.Gray, fontSize = 12.sp)
+            debugLines.forEach { Text(it, color = Color.White, fontSize = 13.sp) }
         }
     }
 }
