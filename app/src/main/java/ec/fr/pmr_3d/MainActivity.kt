@@ -66,7 +66,7 @@ fun Viewer3D() {
 
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
-    val debugLines = remember { mutableStateListOf<String>() }
+//    val debugLines = remember { mutableStateListOf<String>() }
 
     val cameraNode = rememberCameraNode(engine).apply {
         position = Float3(0f, 1f, 4f)
@@ -109,12 +109,12 @@ fun Viewer3D() {
 
     val modelNode = remember {
         try {
-            debugLines.add("⏳ Chargement du modèle...")
+//            debugLines.add("⏳ Chargement du modèle...")
             val instance = modelLoader.createModelInstance("pmr_assembly.glb")
-            debugLines.add("✅ Modèle chargé")
+//            debugLines.add("✅ Modèle chargé")
             ModelNode(modelInstance = instance, scaleToUnits = 1f)
         } catch (e: Exception) {
-            debugLines.add("❌ ${e.javaClass.simpleName}: ${e.message}")
+//            debugLines.add("❌ ${e.javaClass.simpleName}: ${e.message}")
             null
         }
     }
@@ -150,7 +150,7 @@ fun Viewer3D() {
             ).forEach { name ->
                 val entity = asset.getFirstEntityByName(name)
                 if (entity != 0) {
-                    debugLines.add("🎯 '$name' trouvé (id=$entity)")
+//                    debugLines.add("🎯 '$name' trouvé (id=$entity)")
                     val transform = extractTransform(tm, entity)
                     when (name) {
                         "fond"       -> { fondEntity.value = entity; fondOriginalTransform.value = transform }
@@ -168,7 +168,7 @@ fun Viewer3D() {
                         "bitoniau_12"-> { bitoniau12Entity.value = entity; bitoniau12OriginalTransform.value = transform }
                     }
                 } else {
-                    debugLines.add("⚠️ '$name' introuvable")
+//                    debugLines.add("⚠️ '$name' introuvable")
                 }
             }
 
@@ -191,8 +191,8 @@ fun Viewer3D() {
             bitoniau11Entity.value?.let { setEntityVisible(it, false) }
             bitoniau12Entity.value?.let { setEntityVisible(it, false) }
 
-            debugLines.add("📋 Nœuds disponibles :")
-            asset.renderableNames.forEach { debugLines.add("  • '$it'") }
+//            debugLines.add("📋 Nœuds disponibles :")
+//            asset.renderableNames.forEach { debugLines.add("  • '$it'") }
         }
     }
 
@@ -235,7 +235,7 @@ fun Viewer3D() {
                     currentAnimation.value = next
                     pendingAnimation.value = null
                     startTimeNanos.value = frameTimeNanos
-                    debugLines.add("✅ Switched to $next")
+//                    debugLines.add("✅ Switched to $next")
                 }
 
                 when (currentAnimation.value) {
@@ -265,8 +265,8 @@ fun Viewer3D() {
 
                     "animation2" -> {
                         val tm = engine.transformManager
-                        val t = elapsed * (2f * Math.PI.toFloat())
-                        val factor = (1f - kotlin.math.cos(t)) / 2f  // 0 → 1 → 0 en 1s
+                        val t = elapsed * (Math.PI.toFloat())
+                        val factor = (1f - kotlin.math.cos(t)) / 2f
 
                         hautEntity.value?.let { entity ->
                             hautOriginalTransform.value?.let { orig ->
@@ -322,7 +322,7 @@ fun Viewer3D() {
             onClick = {
                 val target = if (currentAnimation.value == "animation1") "animation2" else "animation1"
                 pendingAnimation.value = target
-                debugLines.add("🕐 En attente de fin de cycle pour passer à $target")
+//                debugLines.add("🕐 En attente de fin de cycle pour passer à $target")
             },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -336,16 +336,16 @@ fun Viewer3D() {
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black.copy(alpha = 0.7f))
-                .padding(12.dp)
-        ) {
-            Text("=== DEBUG ===", color = Color.Yellow, fontWeight = FontWeight.Bold)
-            if (debugLines.isEmpty()) Text("(aucun log)", color = Color.Gray, fontSize = 12.sp)
-            debugLines.forEach { Text(it, color = Color.White, fontSize = 13.sp) }
-        }
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(Color.Black.copy(alpha = 0.7f))
+//                .padding(12.dp)
+//        ) {
+//            Text("=== DEBUG ===", color = Color.Yellow, fontWeight = FontWeight.Bold)
+//            if (debugLines.isEmpty()) Text("(aucun log)", color = Color.Gray, fontSize = 12.sp)
+//            debugLines.forEach { Text(it, color = Color.White, fontSize = 13.sp) }
+//        }
     }
 }
 
