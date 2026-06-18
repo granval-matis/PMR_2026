@@ -327,6 +327,32 @@ fun AssemblageScreen(
     val currentStepIndex = remember { mutableStateOf(0) }
     val currentStep = ASSEMBLY_STEPS[currentStepIndex.value]
 
+    val showTerminerDialog = remember { mutableStateOf(false) }
+
+    if (showTerminerDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showTerminerDialog.value = false },
+            title = { Text("Assemblage terminé") },
+            text = { Text("Voulez-vous vraiment terminer l'assemblage et revenir à l'accueil ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showTerminerDialog.value = false
+                    onBack()
+                }) {
+                    Text("Confirmer", color = Color(0xFF4A9EFF))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTerminerDialog.value = false }) {
+                    Text("Annuler", color = Color(0xFF8A94A6))
+                }
+            },
+            containerColor = Color(0xFF1A1D2E),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFE2E8F4)
+        )
+    }
+
     val currentAnimation = remember { mutableStateOf("animation1") }
     val pendingAnimation = remember { mutableStateOf<String?>(null) }
 
@@ -692,8 +718,14 @@ fun AssemblageScreen(
                 )
             }
             Button(
-                onClick = { if (currentStepIndex.value < ASSEMBLY_STEPS.size - 1) currentStepIndex.value++ },
-                enabled = currentStepIndex.value < ASSEMBLY_STEPS.size - 1,
+                onClick = {
+                    if (currentStepIndex.value < ASSEMBLY_STEPS.size - 1) {
+                        currentStepIndex.value++
+                    } else {
+                        showTerminerDialog.value = true
+                    }
+                },
+                enabled = true,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF4A9EFF),
                     disabledContainerColor = Color(0xFF2A3A4E)
