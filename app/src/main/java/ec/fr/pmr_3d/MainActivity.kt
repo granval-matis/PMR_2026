@@ -398,7 +398,9 @@ fun AssemblageScreen(
     val modelNode = remember {
         try {
             val instance = modelLoader.createModelInstance("pmr_assembly.glb")
-            ModelNode(modelInstance = instance, scaleToUnits = 1f)
+            ModelNode(modelInstance = instance, scaleToUnits = 0.9f).apply {
+                position = Float3(0f, 0.5f, 0f)
+            }
         } catch (_: Exception) { null }
     }
 
@@ -451,13 +453,26 @@ fun AssemblageScreen(
                     }
                 }
             }
-            // Masque tout sauf animation1 au départ
+            // Masque tout sauf animation1 au départ et initialise les positions
             hautEntity.value?.let { setEntityVisible(it, false) }
             basEntity.value?.let { setEntityVisible(it, false) }
             listOf(
                 bitoniau5Entity, bitoniau6Entity, bitoniau7Entity, bitoniau8Entity,
                 bitoniau9Entity, bitoniau10Entity, bitoniau11Entity, bitoniau12Entity
             ).forEach { it.value?.let { e -> setEntityVisible(e, false) } }
+
+            // Force l'initialisation de l'animation 1 pour éviter le saut au démarrage
+            val eF = fondEntity.value
+            val eG = gaucheEntity.value
+            val eD = droiteEntity.value
+            val oF = fondOriginalTransform.value
+            val oG = gaucheOriginalTransform.value
+            val oD = droiteOriginalTransform.value
+            if (eF != null && eG != null && eD != null && oF != null && oG != null && oD != null) {
+                tm.setTransform(tm.getInstance(eF), oF)
+                tm.setTransform(tm.getInstance(eG), oG)
+                tm.setTransform(tm.getInstance(eD), oD)
+            }
         }
     }
 
