@@ -158,7 +158,7 @@ fun ScanResultCard(result: ScanResult) {
 }
 
 @Composable
-fun ScanningIndicator(modifier: Modifier) {
+fun ScanningIndicator(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "scan_pulse")
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,

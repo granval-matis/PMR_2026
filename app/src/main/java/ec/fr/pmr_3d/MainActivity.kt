@@ -58,10 +58,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppRoot(currentScreen: MutableState<Screen>) {
     when (currentScreen.value) {
-        Screen.HOME       -> HomeScreen(onNavigate = { currentScreen.value = it })
-        Screen.NOTICE     -> NoticeScreen(onBack = { currentScreen.value = Screen.HOME })
-        Screen.ASSEMBLAGE -> AssemblageScreen(onBack = { currentScreen.value = Screen.HOME })
-        Screen.PARAMETRES -> ParametresScreen(onBack = { currentScreen.value = Screen.HOME })
-        Screen.APROPOS    -> AProposScreen(onBack = { currentScreen.value = Screen.HOME })
+        Screen.HOME        -> HomeScreen(onNavigate = { currentScreen.value = it })
+        Screen.NOTICE      -> NoticeScreen(onBack = { currentScreen.value = Screen.HOME })
+        Screen.SCAN_MEUBLE -> FurnitureScanScreen(
+            onScanSuccess = { currentScreen.value = Screen.ASSEMBLAGE },
+            onBack = { currentScreen.value = Screen.HOME }
+        )
+        Screen.ASSEMBLAGE  -> AssemblageScreen(onBack = { currentScreen.value = Screen.HOME })
+        Screen.PARAMETRES  -> ParametresScreen(onBack = { currentScreen.value = Screen.HOME })
+        Screen.APROPOS     -> AProposScreen(onBack = { currentScreen.value = Screen.HOME })
     }
 }

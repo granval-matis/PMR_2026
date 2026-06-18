@@ -1,6 +1,6 @@
 package ec.fr.pmr_3d.models
 
-enum class Screen { HOME, NOTICE, ASSEMBLAGE, PARAMETRES, APROPOS }
+enum class Screen { HOME, NOTICE, SCAN_MEUBLE, ASSEMBLAGE, PARAMETRES, APROPOS }
 
 data class AssemblyStep(
     val id: Int,
@@ -24,7 +24,7 @@ data class MenuItem(
 
 val MENU_ITEMS = listOf(
     MenuItem("📖", "Notice d'utilisation", "Lisez les instructions avant de commencer", Screen.NOTICE),
-    MenuItem("🛠️", "Assemblage du meuble", "Suivez les étapes d'assemblage en 3D", Screen.ASSEMBLAGE),
+    MenuItem("🛠️", "Assemblage du meuble", "Suivez les étapes d'assemblage en 3D", Screen.SCAN_MEUBLE),
     MenuItem("⚙️", "Paramètres", "Configurer l'affichage et les préférences", Screen.PARAMETRES),
     MenuItem("ℹ️", "À propos du projet", "Équipe, contexte et technologies utilisées", Screen.APROPOS),
 )
