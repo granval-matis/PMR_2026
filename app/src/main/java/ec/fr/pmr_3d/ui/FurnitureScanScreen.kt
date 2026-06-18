@@ -21,6 +21,7 @@ import ec.fr.pmr_3d.QrScanManager
 import ec.fr.pmr_3d.ScanningIndicator
 import ec.fr.pmr_3d.isMagicLeap
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun FurnitureScanScreen(
@@ -32,7 +33,9 @@ fun FurnitureScanScreen(
     val isML = remember { isMagicLeap() }
     
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
+    val scope = rememberCoroutineScope()
     
     val scanManager = remember(previewView) {
         QrScanManager(
@@ -40,8 +43,14 @@ fun FurnitureScanScreen(
             lifecycleOwner = lifecycleOwner,
             previewView = previewView,
             onBarcodeDetected = { rawValue ->
+                if (successMessage != null) return@QrScanManager
+
                 if (rawValue == "Mon meuble") {
-                    onScanSuccess()
+                    successMessage = "Meuble reconnu ! Redirection en cours..."
+                    scope.launch {
+                        delay(2000)
+                        onScanSuccess()
+                    }
                 } else {
                     errorMessage = "QR code non valide : $rawValue"
                 }
@@ -120,24 +129,48 @@ fun FurnitureScanScreen(
 
             Spacer(modifier = Modifier.weight(1f))
             
-            // Message d'erreur
-            AnimatedVisibility(
-                visible = errorMessage != null,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
+            // Messages de retour (Succès / Erreur)
+            Column(
+                modifier = Modifier.padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Surface(
-                    color = Color(0xFFEF4444),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.padding(bottom = 32.dp)
+                AnimatedVisibility(
+                    visible = successMessage != null,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
                 ) {
-                    Text(
-                        text = errorMessage ?: "",
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center
-                    )
+                    Surface(
+                        color = Color(0xFF22C55E),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = successMessage ?: "",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = errorMessage != null,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Surface(
+                        color = Color(0xFFEF4444),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = errorMessage ?: "",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
