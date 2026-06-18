@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -64,5 +65,24 @@ dependencies {
     implementation("com.google.android.filament:filament-android:1.36.0")
     implementation("com.google.android.filament:filament-utils-android:1.36.0")
     implementation("com.google.android.filament:gltfio-android:1.36.0")
+
+    // CameraX
+    implementation("androidx.camera:camera-core:1.4.0")
+    implementation("androidx.camera:camera-camera2:1.4.0")
+    implementation("androidx.camera:camera-lifecycle:1.4.0")
+    implementation("androidx.camera:camera-view:1.4.0")
+
+    // ML Kit — Barcode Scanning
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
+    // Serialisation JSON (QR payload)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // Compose permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+
+    // ViewModel + Coroutines
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 }
 

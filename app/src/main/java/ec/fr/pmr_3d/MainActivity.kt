@@ -1,9 +1,15 @@
 package ec.fr.pmr_3d
 
+import android.Manifest
+import androidx.camera.view.PreviewView
+import android.graphics.PixelFormat
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.filament.Renderer
 import dev.romainguy.kotlin.math.Float3
 import ec.fr.pmr_3d.ui.theme.Pmr_3dTheme
 import io.github.sceneview.Scene
@@ -28,6 +39,12 @@ import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberMainLightNode
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
+import kotlinx.coroutines.launch
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 
 // Modèle de données
 
@@ -68,16 +85,45 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Pmr_3dTheme {
-                AppRoot()
+                val currentScreen = remember { mutableStateOf(Screen.HOME) }
+
+                // Active/désactive la transparence selon l'écran (uniquement sur Magic Leap)
+                LaunchedEffect(currentScreen.value) {
+                    if (currentScreen.value == Screen.ASSEMBLAGE && isMagicLeap()) {
+                        enableArTransparency()
+                    } else {
+                        disableArTransparency()
+                    }
+                }
+
+                AppRoot(currentScreen)
+            }
+        }
+    }
+
+    private fun enableArTransparency() {
+        window.apply {
+            setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+            addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+            clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            attributes = attributes.also { attrs ->
+                attrs.format = PixelFormat.TRANSLUCENT
+            }
+        }
+    }
+
+    private fun disableArTransparency() {
+        window.apply {
+            setBackgroundDrawableResource(android.R.color.black)
+            attributes = attributes.also { attrs ->
+                attrs.format = PixelFormat.OPAQUE
             }
         }
     }
 }
 
 @Composable
-fun AppRoot() {
-    val currentScreen = remember { mutableStateOf(Screen.HOME) }
-
+fun AppRoot(currentScreen: MutableState<Screen>) {
     when (currentScreen.value) {
         Screen.HOME       -> HomeScreen(onNavigate = { currentScreen.value = it })
         Screen.NOTICE     -> NoticeScreen(onBack = { currentScreen.value = Screen.HOME })
@@ -263,8 +309,21 @@ fun NoticeSection(emoji: String, titre: String, texte: String) {
 
 // ÉCRAN ASSEMBLAGE
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun AssemblageScreen(onBack: () -> Unit) {
+fun AssemblageScreen(
+    onBack: () -> Unit,
+    qrViewModel: QrScanViewModel = viewModel()
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val isML = remember { isMagicLeap() }
+    
+    val cameraPermission = rememberPermissionState(Manifest.permission.CAMERA)
+    LaunchedEffect(Unit) {
+        if (!cameraPermission.status.isGranted) cameraPermission.launchPermissionRequest()
+    }
+
     val currentStepIndex = remember { mutableStateOf(0) }
     val currentStep = ASSEMBLY_STEPS[currentStepIndex.value]
 
@@ -275,6 +334,34 @@ fun AssemblageScreen(onBack: () -> Unit) {
     val modelLoader = rememberModelLoader(engine)
     val cameraNode = rememberCameraNode(engine).apply { position = Float3(0f, 1f, 4f) }
     val mainLightNode = rememberMainLightNode(engine).apply { intensity = 100_000f }
+    val renderer = io.github.sceneview.rememberRenderer(engine)
+
+    // On phone, we need to pass a PreviewView to QrScanManager
+    var previewView by remember { mutableStateOf<PreviewView?>(null) }
+
+    val scanManager = remember(previewView) {
+        QrScanManager(
+            context = context,
+            lifecycleOwner = lifecycleOwner,
+            previewView = previewView,
+            onBarcodeDetected = qrViewModel::onBarcodeDetected
+        )
+    }
+
+    // Configure Filament for transparency
+    LaunchedEffect(renderer) {
+        renderer.clearOptions = Renderer.ClearOptions().apply {
+            clearColor = floatArrayOf(0f, 0f, 0f, 0f)
+            clear = true
+        }
+    }
+
+    // Démarrer la caméra immédiatement sur téléphone pour le fond AR
+    LaunchedEffect(isML, previewView, cameraPermission.status.isGranted) {
+        if (!isML && previewView != null && cameraPermission.status.isGranted) {
+            scanManager.startScanning()
+        }
+    }
 
     // Entities
     val fondEntity        = remember { mutableStateOf<Int?>(null) }
@@ -312,7 +399,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
         try {
             val instance = modelLoader.createModelInstance("pmr_assembly.glb")
             ModelNode(modelInstance = instance, scaleToUnits = 1f)
-        } catch (e: Exception) { null }
+        } catch (_: Exception) { null }
     }
 
     fun extractTransform(tm: com.google.android.filament.TransformManager, entity: Int): FloatArray {
@@ -377,19 +464,30 @@ fun AssemblageScreen(onBack: () -> Unit) {
     // Quand l'étape change, déclenche l'animation correspondante
     LaunchedEffect(currentStepIndex.value) {
         pendingAnimation.value = currentStep.animationKey
+        qrViewModel.deactivateScanner()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color.Transparent)
     ) {
+        // Flux caméra en arrière-plan sur téléphone
+        if (!isML) {
+            CameraPreview(
+                onPreviewViewCreated = { previewView = it },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
         Scene(
             modifier = Modifier.fillMaxSize(),
             engine = engine,
             modelLoader = modelLoader,
             cameraNode = cameraNode,
             mainLightNode = mainLightNode,
+            renderer = renderer,
+            isOpaque = false,
             childNodes = rememberNodes { modelNode?.let { add(it) } },
             onFrame = { frameTimeNanos ->
                 if (startTimeNanos.value == 0L) startTimeNanos.value = frameTimeNanos
@@ -464,6 +562,15 @@ fun AssemblageScreen(onBack: () -> Unit) {
             }
         )
 
+        // Overlay QR scan
+        QrScanOverlay(
+            viewModel = qrViewModel,
+            currentStepIndex = currentStepIndex.value,
+            scanManager = scanManager,
+            isML = isML,
+            modifier = Modifier.fillMaxSize()
+        )
+
         // Header : retour + titre sur UNE ligne ─────
         Row(
             modifier = Modifier
@@ -518,6 +625,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
         }
 
         // Description de l'étape
+        val scanState by qrViewModel.state.collectAsState()
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -526,12 +634,21 @@ fun AssemblageScreen(onBack: () -> Unit) {
                 .background(Color(0xCC0F1117), RoundedCornerShape(12.dp))
                 .padding(14.dp)
         ) {
-            Text(
-                text = currentStep.description,
-                color = Color(0xFFE2E8F4),
-                fontSize = 14.sp,
-                lineHeight = 20.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = currentStep.description,
+                    color = Color(0xFFE2E8F4),
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                if (scanState.lastResult is ScanResult.Correct) {
+                    Text("✅", fontSize = 18.sp)
+                }
+            }
         }
 
         // ── Boutons Précédent / Suivant ────────────────
