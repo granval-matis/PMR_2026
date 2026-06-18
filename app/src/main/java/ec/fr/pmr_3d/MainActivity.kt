@@ -29,9 +29,7 @@ import io.github.sceneview.rememberMainLightNode
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// MODÃˆLE DE DONNÃ‰ES
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Modèle de données
 
 enum class Screen { HOME, NOTICE, ASSEMBLAGE, PARAMETRES, APROPOS }
 
@@ -44,8 +42,8 @@ data class AssemblyStep(
 )
 
 val ASSEMBLY_STEPS = listOf(
-    AssemblyStep(1, "Panneaux latÃ©raux", "Assemblez les panneaux gauche et droit avec le fond.", "animation1", "ðŸªµ"),
-    AssemblyStep(2, "Fixation haut/bas", "Positionnez les panneaux haut et bas avec les chevilles.", "animation2", "ðŸ”©"),
+    AssemblyStep(1, "Panneaux latéraux", "Assemblez les panneaux gauche et droit avec le fond.", "animation1", "🧱"),
+    AssemblyStep(2, "Fixation haut/bas", "Positionnez les panneaux haut et bas avec les chevilles.", "animation2", "🔩"),
 )
 
 data class MenuItem(
@@ -56,15 +54,13 @@ data class MenuItem(
 )
 
 val MENU_ITEMS = listOf(
-    MenuItem("ðŸ“–", "Notice d'utilisation", "Lisez les instructions avant de commencer", Screen.NOTICE),
-    MenuItem("ðŸ”§", "Assemblage du meuble", "Suivez les Ã©tapes d'assemblage en 3D", Screen.ASSEMBLAGE),
-    MenuItem("âš™ï¸", "ParamÃ¨tres", "Configurer l'affichage et les prÃ©fÃ©rences", Screen.PARAMETRES),
-    MenuItem("â„¹ï¸", "Ã€ propos du projet", "Ã‰quipe, contexte et technologies utilisÃ©es", Screen.APROPOS),
+    MenuItem("📖", "Notice d'utilisation", "Lisez les instructions avant de commencer", Screen.NOTICE),
+    MenuItem("🛠️", "Assemblage du meuble", "Suivez les étapes d'assemblage en 3D", Screen.ASSEMBLAGE),
+    MenuItem("⚙️", "Paramètres", "Configurer l'affichage et les préférences", Screen.PARAMETRES),
+    MenuItem("ℹ️", "À propos du projet", "Équipe, contexte et technologies utilisées", Screen.APROPOS),
 )
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// ACTIVITÃ‰ PRINCIPALE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ACTIVITÉ PRINCIPALE
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,9 +87,7 @@ fun AppRoot() {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Ã‰CRAN D'ACCUEIL
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ÉCRAN D'ACCUEIL
 
 @Composable
 fun HomeScreen(onNavigate: (Screen) -> Unit) {
@@ -104,7 +98,7 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        // En-tÃªte
+        // En-tête
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,7 +111,7 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "AugmentÃ©",
+                text = "Augmenté",
                 color = Color(0xFF4A9EFF),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold
@@ -182,7 +176,7 @@ fun MenuItemCard(item: MenuItem, onClick: () -> Unit) {
             }
         }
         Text(
-            text = "â€º",
+            text = "",
             color = Color(0xFF4A9EFF),
             fontSize = 22.sp,
             fontWeight = FontWeight.Light,
@@ -191,9 +185,7 @@ fun MenuItemCard(item: MenuItem, onClick: () -> Unit) {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Ã‰CRAN NOTICE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ÉCRAN NOTICE
 
 @Composable
 fun NoticeScreen(onBack: () -> Unit) {
@@ -211,7 +203,7 @@ fun NoticeScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Text("â†", color = Color(0xFF4A9EFF), fontSize = 20.sp)
+                Text("←", color = Color(0xFF4A9EFF), fontSize = 20.sp)
             }
             Text(
                 text = "Notice d'utilisation",
@@ -229,24 +221,24 @@ fun NoticeScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             NoticeSection(
-                emoji = "ðŸ‘“",
-                titre = "MatÃ©riel requis",
-                texte = "Lunettes Magic Leap 2 connectÃ©es et chargÃ©es. Assurez-vous d'Ãªtre dans un espace bien Ã©clairÃ©."
+                emoji = "👓",
+                titre = "Matériel requis",
+                texte = "Lunettes Magic Leap 2 connectées et chargées. Assurez-vous d'être dans un espace bien éclairé."
             )
             NoticeSection(
-                emoji = "ðŸ“¦",
+                emoji = "📦",
                 titre = "Avant de commencer",
-                texte = "Sortez toutes les piÃ¨ces de leur emballage et vÃ©rifiez qu'elles correspondent Ã  la liste fournie."
+                texte = "Sortez toutes les pièces de leur emballage et vérifiez qu'elles correspondent à la liste fournie."
             )
             NoticeSection(
-                emoji = "â–¶",
+                emoji = "🕹️",
                 titre = "Navigation",
-                texte = "Utilisez les boutons PrÃ©cÃ©dent / Suivant pour avancer dans les Ã©tapes. L'animation 3D se lance automatiquement."
+                texte = "Utilisez les boutons Précédent / Suivant pour avancer dans les étapes. L'animation 3D se lance automatiquement."
             )
             NoticeSection(
-                emoji = "âš ï¸",
-                titre = "SÃ©curitÃ©",
-                texte = "Ne forcez jamais les piÃ¨ces. En cas de doute, revenez Ã  l'Ã©tape prÃ©cÃ©dente."
+                emoji = "⚠️",
+                titre = "Sécurité",
+                texte = "Ne forcez jamais les pièces. En cas de doute, revenez à l'étape précédente."
             )
         }
     }
@@ -269,9 +261,7 @@ fun NoticeSection(emoji: String, titre: String, texte: String) {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Ã‰CRAN ASSEMBLAGE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ÉCRAN ASSEMBLAGE
 
 @Composable
 fun AssemblageScreen(onBack: () -> Unit) {
@@ -344,7 +334,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
         }
     }
 
-    // Charge les entitÃ©s du modÃ¨le
+    // Charge les entités du modèle
     LaunchedEffect(modelNode) {
         modelNode?.let { node ->
             val asset = node.modelInstance.asset
@@ -374,7 +364,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
                     }
                 }
             }
-            // Masque tout sauf animation1 au dÃ©part
+            // Masque tout sauf animation1 au départ
             hautEntity.value?.let { setEntityVisible(it, false) }
             basEntity.value?.let { setEntityVisible(it, false) }
             listOf(
@@ -384,7 +374,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
         }
     }
 
-    // Quand l'Ã©tape change â†’ dÃ©clenche l'animation correspondante
+    // Quand l'étape change, déclenche l'animation correspondante
     LaunchedEffect(currentStepIndex.value) {
         pendingAnimation.value = currentStep.animationKey
     }
@@ -394,7 +384,6 @@ fun AssemblageScreen(onBack: () -> Unit) {
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // â”€â”€ ScÃ¨ne 3D â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Scene(
             modifier = Modifier.fillMaxSize(),
             engine = engine,
@@ -475,7 +464,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
             }
         )
 
-        // â”€â”€ Header : retour + titre sur UNE ligne â”€â”€â”€â”€â”€
+        // Header : retour + titre sur UNE ligne ─────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -486,7 +475,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Text("â†", color = Color(0xFF4A9EFF), fontSize = 20.sp)
+                Text("←", color = Color(0xFF4A9EFF), fontSize = 20.sp)
             }
             Text(
                 text = "${currentStep.icone}  ${currentStep.titre}",
@@ -496,14 +485,14 @@ fun AssemblageScreen(onBack: () -> Unit) {
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = if (pendingAnimation.value != null) "â³" else "${currentStep.id}/${ASSEMBLY_STEPS.size}",
+                text = if (pendingAnimation.value != null) "" else "${currentStep.id}/${ASSEMBLY_STEPS.size}",
                 color = Color(0xFF8A94A6),
                 fontSize = 13.sp,
                 modifier = Modifier.padding(end = 12.dp)
             )
         }
 
-        // â”€â”€ Barre de progression SOUS le header â”€â”€â”€â”€â”€â”€â”€
+        // Barre de progression SOUS le header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -528,7 +517,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
             }
         }
 
-        // â”€â”€ Description de l'Ã©tape â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Description de l'étape
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -545,7 +534,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
             )
         }
 
-        // â”€â”€ Boutons PrÃ©cÃ©dent / Suivant â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Boutons Précédent / Suivant ────────────────
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -566,7 +555,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
                     .padding(end = 8.dp)
             ) {
                 Text(
-                    "â—€  PrÃ©cÃ©dent",
+                    "◀  Précédent",
                     color = if (currentStepIndex.value > 0) Color(0xFF4A9EFF) else Color(0xFF3A3D4E)
                 )
             }
@@ -582,7 +571,7 @@ fun AssemblageScreen(onBack: () -> Unit) {
                     .padding(start = 8.dp)
             ) {
                 Text(
-                    if (currentStepIndex.value < ASSEMBLY_STEPS.size - 1) "Suivant  â–¶" else "âœ“ TerminÃ©",
+                    if (currentStepIndex.value < ASSEMBLY_STEPS.size - 1) "Suivant  ▶" else "✓ Terminé",
                     color = Color.White
                 )
             }
@@ -590,9 +579,9 @@ fun AssemblageScreen(onBack: () -> Unit) {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Ã‰CRAN PARAMÃˆTRES
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// ÉCRAN PARAMÈTRES
+// ─────────────────────────────────────────────
 
 @Composable
 fun ParametresScreen(onBack: () -> Unit) {
@@ -613,10 +602,10 @@ fun ParametresScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Text("â†", color = Color(0xFF4A9EFF), fontSize = 20.sp)
+                Text("←", color = Color(0xFF4A9EFF), fontSize = 20.sp)
             }
             Text(
-                "ParamÃ¨tres",
+                "Paramètres",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -646,7 +635,7 @@ fun ParametresScreen(onBack: () -> Unit) {
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        "Texte explicatif sous la scÃ¨ne 3D",
+                        "Texte explicatif sous la scène 3D",
                         color = Color(0xFF8A94A6),
                         fontSize = 12.sp
                     )
@@ -716,15 +705,15 @@ fun ParametresScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Version", color = Color.White, fontSize = 15.sp)
-                Text("0.1.0 â€” prototype", color = Color(0xFF8A94A6), fontSize = 13.sp)
+                Text("0.1.0 — prototype", color = Color(0xFF8A94A6), fontSize = 13.sp)
             }
         }
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Ã‰CRAN Ã€ PROPOS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
+// ÉCRAN À PROPOS
+// ─────────────────────────────────────────────
 
 @Composable
 fun AProposScreen(onBack: () -> Unit) {
@@ -742,10 +731,10 @@ fun AProposScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Text("â†", color = Color(0xFF4A9EFF), fontSize = 20.sp)
+                Text("←", color = Color(0xFF4A9EFF), fontSize = 20.sp)
             }
             Text(
-                "Ã€ propos du projet",
+                "À propos du projet",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -766,16 +755,16 @@ fun AProposScreen(onBack: () -> Unit) {
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("ðŸ¥½", fontSize = 40.sp)
+                Text("🥽", fontSize = 40.sp)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Assemblage AugmentÃ©",
+                    "Assemblage Augmenté",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )
                 Text(
-                    "Assistance mains-libres en RÃ©alitÃ© AugmentÃ©e\npour le montage de structures",
+                    "Assistance mains-libres en Réalité Augmentée\npour le montage de structures",
                     color = Color(0xFF8A94A6),
                     fontSize = 13.sp,
                     lineHeight = 18.sp,
@@ -784,7 +773,7 @@ fun AProposScreen(onBack: () -> Unit) {
                 )
             }
 
-            // Ã‰quipe
+            // Équipe
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -793,7 +782,7 @@ fun AProposScreen(onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    "ðŸ‘¥  Ã‰quipe",
+                    "👥  Équipe",
                     color = Color(0xFF4A9EFF),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
@@ -805,7 +794,7 @@ fun AProposScreen(onBack: () -> Unit) {
                     "Paul Delachaux",
                     "Karl Garrido Andersson"
                 ).forEach { nom ->
-                    Text("Â· $nom", color = Color(0xFFE2E8F4), fontSize = 14.sp)
+                    Text("· $nom", color = Color(0xFFE2E8F4), fontSize = 14.sp)
                 }
             }
 
@@ -818,7 +807,7 @@ fun AProposScreen(onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "ðŸ›   Stack technique",
+                    "🛠   Stack technique",
                     color = Color(0xFF4A9EFF),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
@@ -827,8 +816,8 @@ fun AProposScreen(onBack: () -> Unit) {
                     "Magic Leap 2"      to "Lunettes AR",
                     "Unity + AR Foundation" to "Rendu 3D",
                     "Kotlin / Android"  to "App compagnon",
-                    "TensorFlow Lite"   to "Tracking piÃ¨ces (Ã  venir)",
-                    "Google Cloud"      to "Base de donnÃ©es (Ã  venir)"
+                    "TensorFlow Lite"   to "Tracking pièces (à venir)",
+                    "Google Cloud"      to "Base de données (à venir)"
                 ).forEach { (techno, role) ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -843,14 +832,14 @@ fun AProposScreen(onBack: () -> Unit) {
     }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 // PREVIEW
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     Pmr_3dTheme {
-        Text("PrÃ©visualisation non disponible pour la vue 3D")
+        Text("Prévisualisation non disponible pour la vue 3D")
     }
 }
